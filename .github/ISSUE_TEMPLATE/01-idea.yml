@@ -1,0 +1,60 @@
+name: 💡 アイデア・機能提案
+description: エージェントにやらせたいこと、あったら便利な機能を提案する
+title: "[Idea] "
+labels: ["type:idea", "status:triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        思いつきレベルで OK です。決まっていない項目は空欄のままで構いません。
+  - type: dropdown
+    id: area
+    attributes:
+      label: 領域
+      multiple: true
+      options:
+        - ログ記録
+        - アップデート管理
+        - 質問・トラブル対応
+        - モデル（ローカル / API）
+        - 安全・権限
+        - インターフェース・通知
+        - その他
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: やらせたいこと
+      description: エージェントに何をしてほしいか
+      placeholder: 例）毎朝 8 時に前日のログを要約して Slack に送ってほしい
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: なぜ必要か・困っていること
+  - type: dropdown
+    id: risk
+    attributes:
+      label: 必要な権限レベル（想定）
+      description: 判断できなければ「わからない」で OK
+      options:
+        - 参照のみ（読むだけ）
+        - 軽微な変更
+        - 変更あり（承認必須）
+        - 危険操作を含む（再起動・削除など）
+        - わからない
+  - type: dropdown
+    id: model
+    attributes:
+      label: 処理するモデル（想定）
+      options:
+        - ローカルで十分そう
+        - API が必要そう
+        - 機密情報を含むのでローカル限定
+        - わからない
+  - type: textarea
+    id: notes
+    attributes:
+      label: 補足・参考リンク

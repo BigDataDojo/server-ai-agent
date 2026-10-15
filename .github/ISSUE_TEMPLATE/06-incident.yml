@@ -1,0 +1,49 @@
+name: 🔥 障害事例・ナレッジ
+description: 実際に起きたサーバー障害とその対応を記録する（将来エージェントの知識ベースになる）
+title: "[Incident] "
+labels: ["type:incident"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ここに集めた事例は、エージェントが「前にも似たことがあった」と参照するための材料になります。
+        ⚠️ **機密情報は伏せてください。**
+  - type: input
+    id: when
+    attributes:
+      label: 発生日時
+      placeholder: 2026-10-15 03:00 頃
+    validations:
+      required: true
+  - type: textarea
+    id: symptom
+    attributes:
+      label: 症状
+      placeholder: 例）Web サーバーが 502 を返す
+    validations:
+      required: true
+  - type: textarea
+    id: investigation
+    attributes:
+      label: 調査の流れ
+      description: 何を確認したか（コマンドと結果）。エージェントの手順書の元になります
+  - type: textarea
+    id: cause
+    attributes:
+      label: 原因
+  - type: textarea
+    id: fix
+    attributes:
+      label: 対処内容
+  - type: textarea
+    id: prevention
+    attributes:
+      label: 再発防止・エージェントに任せられそうなこと
+  - type: dropdown
+    id: handled-by
+    attributes:
+      label: 対応者
+      options:
+        - 人間のみ
+        - エージェントが調査・人間が対処
+        - エージェントが対処（承認あり）

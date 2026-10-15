@@ -1,0 +1,61 @@
+name: 🐞 エージェントの不具合・誤動作
+description: エージェントが間違った判断・操作をした、期待通りに動かなかった
+title: "[Bug] "
+labels: ["type:bug", "status:triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ⚠️ **ログやコマンド出力を貼る前に、IP アドレス・ホスト名・ユーザー名・トークン等を伏せてください。**
+  - type: dropdown
+    id: severity
+    attributes:
+      label: 深刻度
+      options:
+        - "S1: サーバーに実害あり（停止・データ損失など）"
+        - "S2: 承認なしで変更操作をした / 安全策をすり抜けた"
+        - "S3: 誤った回答・提案をした"
+        - "S4: 軽微（表示・ログの不備など）"
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 何が起きたか
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 本来どうなるべきだったか
+    validations:
+      required: true
+  - type: textarea
+    id: trigger
+    attributes:
+      label: きっかけ（指示・アラート・定期実行など）
+  - type: dropdown
+    id: model
+    attributes:
+      label: 使われたモデル
+      options:
+        - ローカルモデル
+        - API モデル
+        - 両方 / 途中で切り替わった
+        - 不明
+  - type: textarea
+    id: audit-log
+    attributes:
+      label: 監査ログ・実行コマンド（マスキング済み）
+      render: shell
+  - type: input
+    id: session
+    attributes:
+      label: セッション ID（あれば）
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 確認
+      options:
+        - label: 機密情報を伏せた
+          required: true

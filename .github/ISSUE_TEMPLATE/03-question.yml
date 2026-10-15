@@ -1,0 +1,16 @@
+name: ❓ 質問・相談
+description: 構想や設計についてわからないこと、確認したいこと
+title: "[Q] "
+labels: ["type:question"]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: 質問内容
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: 関連するドキュメント・背景
+      placeholder: 例）docs/model-strategy.md の「エスカレーション基準」について

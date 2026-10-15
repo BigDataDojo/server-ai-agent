@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 未決事項リスト
+    url: https://github.com/OWNER/server-ai-agent/blob/main/docs/open-questions.md
+    about: まず既存の未決事項に含まれていないか確認してください
+  - name: Issue の書き方ガイド
+    url: https://github.com/OWNER/server-ai-agent/blob/main/docs/issue-guide.md
+    about: どのテンプレートを使うか迷ったらこちら

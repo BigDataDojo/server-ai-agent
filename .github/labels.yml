@@ -1,0 +1,35 @@
+# リポジトリで使うラベルの定義。
+# GitHub に反映するときは docs/issue-guide.md の手順を参照。
+
+# --- 種類 ---
+- { name: "type:idea",     color: "a2eeef", description: "アイデア・機能提案" }
+- { name: "type:decision", color: "5319e7", description: "設計判断の議論（決定後 ADR へ）" }
+- { name: "type:question", color: "d876e3", description: "質問・相談" }
+- { name: "type:task",     color: "0e8a16", description: "具体的な作業" }
+- { name: "type:bug",      color: "d73a4a", description: "エージェントの不具合・誤動作" }
+- { name: "type:incident", color: "b60205", description: "障害事例・ナレッジ" }
+
+# --- 領域 ---
+- { name: "area:logging",   color: "c5def5", description: "ログ記録" }
+- { name: "area:updates",   color: "c5def5", description: "カーネル・パッケージ・モジュール更新" }
+- { name: "area:troubleshooting", color: "c5def5", description: "質問・トラブル対応" }
+- { name: "area:model",     color: "c5def5", description: "ローカルモデル / API" }
+- { name: "area:safety",    color: "c5def5", description: "権限・承認・監査" }
+- { name: "area:interface", color: "c5def5", description: "UI・通知・チャット連携" }
+
+# --- 権限レベル（docs/safety.md の分類） ---
+- { name: "risk:read",      color: "e6f4ea", description: "参照のみ" }
+- { name: "risk:minor",     color: "fef2c0", description: "軽微な変更" }
+- { name: "risk:change",    color: "fbca04", description: "変更あり・承認必須" }
+- { name: "risk:dangerous", color: "e99695", description: "危険操作を含む" }
+
+# --- 状態 ---
+- { name: "status:triage",     color: "ededed", description: "未整理" }
+- { name: "status:discussion", color: "bfd4f2", description: "議論中" }
+- { name: "status:decided",    color: "0052cc", description: "決定済み（ADR 化待ち/済み）" }
+- { name: "status:blocked",    color: "000000", description: "他の決定・作業待ち" }
+- { name: "status:wontfix",    color: "ffffff", description: "やらないことにした" }
+
+# --- その他 ---
+- { name: "good first issue", color: "7057ff", description: "取り組みやすい" }
+- { name: "help wanted",      color: "008672", description: "意見・協力がほしい" }

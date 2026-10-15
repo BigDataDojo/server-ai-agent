@@ -31,6 +31,7 @@
 - [docs/roadmap.md](docs/roadmap.md) — 段階的な導入計画
 - [docs/open-questions.md](docs/open-questions.md) — 未決事項リスト
 - [docs/adr/](docs/adr/) — 設計判断の記録（Architecture Decision Records）
+- [docs/issue-guide.md](docs/issue-guide.md) — Issue・PR の書き方とラベル体系
 
 ## ディレクトリ構成
 
@@ -47,4 +48,7 @@
 
 ## ステータス
 
-🟡 **構想段階** — 実装なし。アイデアは Issue（テンプレート「アイデア」）か `docs/open-questions.md` に追記してください。
+🟡 **構想段階** — 実装なし。
+
+アイデア・議論・障害事例などは Issue で共有してください。種類ごとにテンプレートがあります（[使い分け](docs/issue-guide.md)）。
+⚠️ Issue にログ等を貼るときは、IP・ホスト名・トークンなどの機密情報を伏せてください。
