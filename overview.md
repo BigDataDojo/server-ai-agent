@@ -15,7 +15,7 @@ Oct 17, 2026 · @井阪正俊
 
 ## 全体構成
 
-![AIエージェントの構成図](construntion.png)
+![AIエージェントの構成図](./construntion.png)
 
 外部からサーバへの入口は、すでに管理しているCloudflareに集約する。サーバはCloudflare Tunnelで外向きに接続するだけなので、学内ファイアウォールに受信ポートを開けずに済む。運用担当者のWeb UIも、Claude Teamのカスタムコネクタから使うMCPサーバも、Cloudflare Accessで本人確認してから通す。サーバ内ではオーケストレーターが計画と承認を管理し、モデルルーターが機密度と難易度でローカルLLMかClaude APIかを振り分け、APIへの通信はAI Gatewayを経由させてログと利用上限を管理する。
 
