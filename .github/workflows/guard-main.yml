@@ -1,0 +1,68 @@
+# main への push を見張る。
+# Free プランの private リポジトリではブランチ保護が使えないため、PR を通さずに
+# notes/ の外（設計書など）が変更されたら、Issue を立てて知らせる。止めることはできない。
+# GitHub Team プランに上がって ruleset で main を保護したら、このワークフローは消してよい。
+name: main の見張り
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BEFORE: ${{ github.event.before }}
+      AFTER: ${{ github.sha }}
+      PUSHER: ${{ github.event.pusher.name }}
+      COMPARE_URL: ${{ github.event.compare }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: PR を通した変更か確認
+        run: |
+          # PR のマージで入った commit なら問題なし
+          merged=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${AFTER}/pulls" --jq '[.[] | select(.merged_at != null)] | length')
+          if [ "$merged" -gt 0 ]; then
+            echo "PR を通した変更です。"
+            exit 0
+          fi
+
+          if [ "$BEFORE" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
+            echo "::warning::比較元の commit が見つからないため、確認できませんでした"
+            exit 0
+          fi
+
+          outside=$(git diff --name-only "$BEFORE" "$AFTER" | grep -v '^notes/' || true)
+          if [ -z "$outside" ]; then
+            echo "notes/ だけの変更です。"
+            exit 0
+          fi
+
+          body=$(cat <<EOF
+          PR を通さずに、main の notes/ の外が変更されました。
+
+          - push した人：@${PUSHER}
+          - 変更：${COMPARE_URL}
+
+          変更されたファイル：
+
+          \`\`\`
+          ${outside}
+          \`\`\`
+
+          意図した変更なら、立ち上げメンバーが確認してこの Issue を閉じてください。
+          意図しない変更なら、\`git revert\` で戻し、改めて PR を出してください。
+          EOF
+          )
+          gh issue create --title "PR を通さない main への変更（${AFTER:0:7}）" --body "$body" --label guard \
+            || gh issue create --title "PR を通さない main への変更（${AFTER:0:7}）" --body "$body"
+          echo "::error::PR を通さずに notes/ の外が変更されました"
+          exit 1
