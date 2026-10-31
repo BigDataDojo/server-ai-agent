@@ -58,12 +58,24 @@ Issue を閉じたり PR をマージしたりすると、ボードも自動で�
 1. **チームを作る**：組織の Teams → New team。[members.md](members.md#github-のチーム) の名前で作り、子チームは「Parent team」に親を指定する
 2. **チームにリポジトリの権限を付ける**：このリポジトリの Settings → Collaborators and teams で、各チームに Write を付ける
 3. **Actions の権限を設定する**：Settings → Actions → General → Workflow permissions で「Read and write permissions」を選び、「Allow GitHub Actions to create and approve pull requests」にチェックを入れる（調査メモの自動マージに必要）
-4. **ラベルを反映する**：Actions タブ → 「ラベルの同期」→ Run workflow。古いラベル（`area:logging` など）は自動では消えないので、要らなければ手で消す
-5. **Projects のボードと Milestone を作る**：上の「Projects のボード」「Milestone」のとおり
+4. **承認者を登録する**：[`.github/founders.txt`](../.github/founders.txt) に立ち上げメンバーの GitHub ID を1行に1人書き、PR で出す。「main の見張り」は、`notes/` の外に触る PR がここにいる人の承認なしでマージされると Issue を立てる（空のあいだは「PR を出した人以外の承認」があれば通す）
+5. **ラベルを反映する**：Actions タブ → 「ラベルの同期」→ Run workflow。古いラベル（`area:logging` など）は自動では消えないので、要らなければ手で消す
+6. **Projects のボードと Milestone を作る**：上の「Projects のボード」「Milestone」のとおり
+
+### いまの守り方（Free プランの private リポジトリ）
+
+Free プランの private リポジトリでは、main を保護できない。そのため次の運用ルールを決め、違反は「main の見張り」（[`.github/workflows/guard-main.yml`](../.github/workflows/guard-main.yml)）で見つける。止めることはできず、すぐ気づけるようにするだけである。
+
+| ルール | 違反したとき |
+| --- | --- |
+| main に直接 push しない（`notes/` は `notes/<ID>` ブランチから） | `notes/` の外が変わったら Issue を立てる |
+| `notes/` の外に触る PR は、立ち上げメンバーの承認を得てからマージする | 承認なしでマージされたら Issue を立てる |
+
+Issue の本文で `@BigDataDojo/server-agent-founders` を呼ぶので、チームを作っておけば立ち上げメンバー全員に通知が届く。
 
 ### GitHub Team プランに上がったら
 
-Free プランの private リポジトリでは、main を保護できない。いまは「main の見張り」の Actions が、PR を通さない変更を見つけて Issue で知らせるだけである。GitHub Team プラン（GitHub Education で教員が無料で申請できる）に上がったら、次を設定する。
+GitHub Team プラン（GitHub Education で教員が無料で申請できる）なら、上のルールを機械的に強制できる。上がったら次を設定する。
 
 1. Settings → Rules → Rulesets → New branch ruleset で、対象を `main` にして次を有効にする
    - Restrict deletions
