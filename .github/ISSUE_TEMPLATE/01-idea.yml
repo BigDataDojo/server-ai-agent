@@ -13,12 +13,11 @@ body:
       label: 領域
       multiple: true
       options:
-        - ログ記録
-        - アップデート管理
-        - 質問・トラブル対応
-        - モデル（ローカル / API）
+        - 共通基盤（Slack の受付・振り分け）
+        - ローカルLLM エージェント
+        - Claude エージェント
+        - 研究室のインフラ
         - 安全・権限
-        - インターフェース・通知
         - その他
     validations:
       required: true
@@ -27,7 +26,7 @@ body:
     attributes:
       label: やらせたいこと
       description: エージェントに何をしてほしいか
-      placeholder: 例）毎朝 8 時に前日のログを要約して Slack に送ってほしい
+      placeholder: 例）証明書の期限が近いサービスを毎朝 Slack に知らせてほしい
     validations:
       required: true
   - type: textarea
@@ -40,10 +39,10 @@ body:
       label: 必要な権限レベル（想定）
       description: 判断できなければ「わからない」で OK
       options:
-        - 参照のみ（読むだけ）
-        - 軽微な変更
-        - 変更あり（承認必須）
-        - 危険操作を含む（再起動・削除など）
+        - "L0: 閲覧（状態確認、ログ参照）"
+        - "L1: 安全な操作（サービス再起動など）"
+        - "L2: 作成・設定変更（承認必須）"
+        - "L3: 削除・根幹の設定"
         - わからない
   - type: dropdown
     id: model

@@ -1,0 +1,29 @@
+# .github/labels.yml のラベルを GitHub に反映する。
+# 定義にあるラベルは作成・更新する。定義にないラベルは消さない。
+name: ラベルの同期
+
+on:
+  push:
+    branches: [main]
+    paths: [".github/labels.yml"]
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: ラベルを作成・更新
+        run: |
+          yq -o=json '.' .github/labels.yml | jq -c '.[]' | while read -r label; do
+            name=$(jq -r '.name' <<<"$label")
+            color=$(jq -r '.color' <<<"$label")
+            description=$(jq -r '.description' <<<"$label")
+            gh label create "$name" --color "$color" --description "$description" --force
+          done
