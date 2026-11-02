@@ -1,0 +1,134 @@
+# main への push を見張る。
+# Free プランの private リポジトリではブランチ保護が使えないため、次の2つを見つけたら
+# 立ち上げメンバーを呼ぶ Issue を立てて知らせる。止めることはできない。
+#   1. PR を通さずに notes/ の外（設計書など）が変更された
+#   2. notes/ の外に触る PR が、立ち上げメンバーの承認なしでマージされた
+# 承認を有効とする人は .github/founders.txt に書く。
+# GitHub Team プランに上がって ruleset で main を保護したら、このワークフローは消してよい。
+name: main の見張り
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BEFORE: ${{ github.event.before }}
+      AFTER: ${{ github.sha }}
+      PUSHER: ${{ github.event.pusher.name }}
+      COMPARE_URL: ${{ github.event.compare }}
+      NOTIFY: "@BigDataDojo/server-agent-founders"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: ルールどおりの変更か確認
+        run: |
+          notify() {
+            # $1: タイトル、$2: 本文
+            gh issue create --title "$1" --body "$2" --label guard \
+              || gh issue create --title "$1" --body "$2"
+            echo "::error::$1"
+            exit 1
+          }
+
+          pr=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${AFTER}/pulls" \
+            --jq '[.[] | select(.merged_at != null)][0] // empty')
+
+          if [ -n "$pr" ]; then
+            # --- PR のマージで入った変更：notes/ の外に触るなら承認を確認する ---
+            number=$(jq -r '.number' <<<"$pr")
+            author=$(jq -r '.user.login' <<<"$pr")
+
+            outside=$(gh api --paginate "repos/${GITHUB_REPOSITORY}/pulls/${number}/files" --jq '.[].filename' \
+              | grep -v '^notes/' || true)
+            if [ -z "$outside" ]; then
+              echo "notes/ だけの PR です。"
+              exit 0
+            fi
+
+            approvers=$(gh api --paginate "repos/${GITHUB_REPOSITORY}/pulls/${number}/reviews" \
+              --jq '.[] | select(.state == "APPROVED") | .user.login' | sort -u)
+            founders=$(grep -v '^\s*#' .github/founders.txt 2>/dev/null | tr -d ' \t\r' | grep -v '^$' || true)
+
+            ok=""
+            for a in $approvers; do
+              [ "$a" = "$author" ] && continue
+              if [ -z "$founders" ] || grep -qxiF "$a" <<<"$founders"; then
+                ok="$a"
+                break
+              fi
+            done
+
+            if [ -n "$ok" ]; then
+              echo "#${number} は @${ok} の承認を得てマージされています。"
+              exit 0
+            fi
+
+            if [ -z "$founders" ]; then
+              need="PR を出した人以外の承認"
+            else
+              need="立ち上げメンバー（.github/founders.txt）の承認"
+            fi
+
+            body=$(cat <<EOF
+          ${NOTIFY}
+
+          #${number} が、${need}なしで main にマージされました。
+
+          - PR を出した人：@${author}
+          - マージ後に push された commit：${AFTER}
+
+          変更されたファイル（notes/ 以外）：
+
+          \`\`\`
+          ${outside}
+          \`\`\`
+
+          MTG で採用が決まっていた変更なら、立ち上げメンバーが PR を確認してこの Issue を閉じてください。
+          決まっていなかった変更なら、\`git revert\` で戻し、改めて PR を出してください。
+          EOF
+            )
+            notify "承認なしでマージされた PR（#${number}）" "$body"
+          fi
+
+          # --- PR を通さない直接の push：notes/ の外に触っていないか確認する ---
+          if [ "$BEFORE" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
+            echo "::warning::比較元の commit が見つからないため、確認できませんでした"
+            exit 0
+          fi
+
+          outside=$(git diff --name-only "$BEFORE" "$AFTER" | grep -v '^notes/' || true)
+          if [ -z "$outside" ]; then
+            echo "notes/ だけの変更です。"
+            exit 0
+          fi
+
+          body=$(cat <<EOF
+          ${NOTIFY}
+
+          PR を通さずに、main の notes/ の外が変更されました。
+
+          - push した人：@${PUSHER}
+          - 変更：${COMPARE_URL}
+
+          変更されたファイル：
+
+          \`\`\`
+          ${outside}
+          \`\`\`
+
+          意図した変更なら、立ち上げメンバーが確認してこの Issue を閉じてください。
+          意図しない変更なら、\`git revert\` で戻し、改めて PR を出してください。
+          EOF
+          )
+          notify "PR を通さない main への変更（${AFTER:0:7}）" "$body"

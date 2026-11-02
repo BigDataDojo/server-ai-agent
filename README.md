@@ -1,54 +1,34 @@
 # server-ai-agent
 
-サーバー運用を任せる AI エージェントの **構想・設計メモ用リポジトリ** です。
-現時点では実装はなく、「何をやらせたいか」「どう安全に動かすか」を整理する段階です。
-スクリプトやサードパーティー連携は、方針が固まり次第このリポジトリに追加していきます。
+研究室の鯖缶（サーバー管理者）の仕事を、AI エージェントと一緒にやる仕組みを作るプロジェクトの **設計書リポジトリ** です。
+Slack に来た問い合わせを受け付け、ドキュメントで答えられるものはローカルLLM のエージェントが、サーバーの調査・操作が必要なものは Claude のエージェントが担当します。
 
-## やらせたいこと（概要）
+いまは設計の段階です。コードを書く前に、何を作るか・どう作るかを設計書にまとめ、MTG で採用を決めてから作ります。
 
-| 領域 | 内容 | 詳細 |
-|---|---|---|
-| 実行ログの記録 | エージェント自身の行動ログ、システムログの収集・要約・異常検知 | [docs/use-cases/logging.md](docs/use-cases/logging.md) |
-| アップデート管理 | カーネル・パッケージ・カーネルモジュール（DKMS 等）の更新計画と実行 | [docs/use-cases/updates.md](docs/use-cases/updates.md) |
-| 質問・トラブル対応 | 「このサーバー今どうなってる？」への回答、障害の一次切り分け | [docs/use-cases/troubleshooting.md](docs/use-cases/troubleshooting.md) |
+## どこに何があるか
 
-## 基本方針
+![リポジトリの構成：設計書は PR とレビューを通って main に入り、調査メモは push するだけで Actions が main に入れる](project/images/repo-structure.png)
 
-- **ローカルモデル + API のハイブリッド構成**
-  日常的・機密性の高い処理はローカル LLM、難しい推論や長文解析は API モデルに振り分ける。
-  → [docs/model-strategy.md](docs/model-strategy.md)
-- **安全第一**：破壊的操作は人間の承認を必須にし、全操作を記録・ロールバック可能にする。
-  → [docs/safety.md](docs/safety.md)
-- **段階的に権限を広げる**：最初は「読むだけ・提案するだけ」から始める。
-  → [docs/roadmap.md](docs/roadmap.md)
+| 場所 | 中身 | 変更の出し方 |
+| --- | --- | --- |
+| [`design/`](design/) | **設計書**。MTG で採用したものだけが main に入る。最終的にこれが1冊の設計書になる | PR 必須（立ち上げメンバーのレビュー） |
+| [`notes/`](notes/) | **調査メモと議事録**。技術の調べ物、できないこと、自前で作る必要があること、トレードオフ | PR 不要（`notes/<名前>` ブランチに push すると自動で main に入る） |
+| [`project/`](project/) | **運営**。今期のゴール、役割とコース分担、進め方 | PR 必須 |
+| [`archive/`](archive/) | キックオフ前の旧構想資料（更新しない） | — |
 
-## ドキュメント
+## はじめに読むもの
 
-- [docs/vision.md](docs/vision.md) — 目的・スコープ・やらないこと
-- [docs/architecture.md](docs/architecture.md) — 全体構成案（コンポーネント図）
-- [docs/model-strategy.md](docs/model-strategy.md) — ローカルモデルと API の使い分け
-- [docs/safety.md](docs/safety.md) — 権限・承認・監査・ロールバック
-- [docs/roadmap.md](docs/roadmap.md) — 段階的な導入計画
-- [docs/open-questions.md](docs/open-questions.md) — 未決事項リスト
-- [docs/adr/](docs/adr/) — 設計判断の記録（Architecture Decision Records）
-- [docs/issue-guide.md](docs/issue-guide.md) — Issue・PR の書き方とラベル体系
+1. [design/00-overview](design/00-overview/) — 何を目指しているか、2種類のエージェント、権限レベル
+2. [design/01-infra](design/01-infra/) — 研究室のインフラの現状
+3. [project/process.md](project/process.md) — 週次 MTG と、設計書・調査メモの出し方
+4. [design/00-overview/glossary.md](design/00-overview/glossary.md) — 分からない言葉が出てきたら
 
-## ディレクトリ構成
+## 守ること
 
-```
-.
-├── docs/            # 構想・設計ドキュメント（現在の中心）
-│   ├── use-cases/   # ユースケース別の詳細
-│   └── adr/         # 設計判断の記録
-├── agent/           # （予定）エージェント本体
-├── scripts/         # （予定）運用スクリプト・ツール群
-├── config/          # （予定）設定ファイルのサンプル
-└── integrations/    # （予定）サードパーティー連携
-```
+- パスワード・鍵・トークンは、設計書にも調査メモにも Issue にも **絶対に書かない**
+- Slack のログやサーバーの出力を貼るときは、人の名前・IP アドレス・ホスト名を伏せる
+- 料金・モデル名・規約は変わりやすいので、数字には出典と確認日を添える
 
 ## ステータス
 
-🟡 **構想段階** — 実装なし。
-
-アイデア・議論・障害事例などは Issue で共有してください。種類ごとにテンプレートがあります（[使い分け](docs/issue-guide.md)）。
-⚠️ Issue にログ等を貼るときは、IP・ホスト名・トークンなどの機密情報を伏せてください。
+🟡 **設計段階**（今期のゴールは [project/README.md](project/README.md)）

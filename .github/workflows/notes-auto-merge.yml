@@ -1,0 +1,79 @@
+# notes/<GitHub ID> ブランチに push されたら、PR を作ってそのまま main にマージする。
+# 調査メモと議事録（notes/）だけはレビューなしで main に入れるための仕組み。
+# notes/ の外のファイルが混ざっていたら、マージせずに失敗させる。
+#
+# 必要なリポジトリ設定（管理者）：
+#   Settings → Actions → General → Workflow permissions
+#   「Read and write permissions」と「Allow GitHub Actions to create and approve pull requests」
+name: notes 自動マージ
+
+on:
+  push:
+    branches: ["notes/**"]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: notes-auto-merge-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BRANCH: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: notes/ の外の変更がないか確認
+        id: check
+        run: |
+          git fetch origin main
+          files=$(git diff --name-only origin/main...HEAD)
+          if [ -z "$files" ]; then
+            echo "main との差分がないので何もしません。"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          outside=$(printf '%s\n' "$files" | grep -v '^notes/' || true)
+          if [ -n "$outside" ]; then
+            {
+              echo "### notes/ の外のファイルが含まれています"
+              echo
+              echo "このブランチは自動マージしません。設計書などの変更は、別のブランチから PR を出してください。"
+              echo
+              echo '```'
+              printf '%s\n' "$outside"
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::error::notes/ の外のファイルが含まれているため、自動マージしません"
+            printf '%s\n' "$outside"
+            exit 1
+          fi
+
+      - name: PR を作ってマージ
+        if: steps.check.outputs.skip != 'true'
+        run: |
+          pr=$(gh pr list --head "$BRANCH" --base main --state open --json number --jq '.[0].number // empty')
+          if [ -z "$pr" ]; then
+            gh pr create --base main --head "$BRANCH" \
+              --title "notes: ${GITHUB_ACTOR} の調査メモ・議事録" \
+              --body "\`${BRANCH}\` ブランチへの push から自動で作った PR です。notes/ の変更だけなので、レビューなしでマージします。"
+            pr=$(gh pr list --head "$BRANCH" --base main --state open --json number --jq '.[0].number')
+          fi
+
+          # 作った直後はマージできるかの判定が終わっていないことがあるので、数回試す
+          for i in 1 2 3 4 5; do
+            if gh pr merge "$pr" --merge; then
+              exit 0
+            fi
+            sleep 10
+          done
+
+          gh pr comment "$pr" --body "自動マージに失敗しました。ほかの人の変更とぶつかっている可能性があります。\`git pull origin main\` で取り込んで直してから、もう一度 push してください。"
+          exit 1

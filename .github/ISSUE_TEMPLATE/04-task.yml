@@ -1,19 +1,17 @@
 name: ✅ タスク
-description: ロードマップ上の具体的な作業
+description: 具体的な作業（設計の決定以外）
 title: "[Task] "
 labels: ["type:task"]
 body:
   - type: dropdown
-    id: phase
+    id: course
     attributes:
-      label: フェーズ
-      description: docs/roadmap.md のどの段階か
+      label: コース
       options:
-        - "Phase 0: 構想整理"
-        - "Phase 1: 観察者（読み取り専用）"
-        - "Phase 2: 助言者（提案まで）"
-        - "Phase 3: 実行者（承認制）"
-        - "Phase 4: 自律運用"
+        - "A: ローカルLLM"
+        - "B: インフラ／Claude エージェント"
+        - "C: 共通基盤"
+        - 全体
     validations:
       required: true
   - type: textarea

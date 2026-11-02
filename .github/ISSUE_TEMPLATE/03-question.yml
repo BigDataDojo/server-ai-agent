@@ -13,4 +13,4 @@ body:
     id: context
     attributes:
       label: 関連するドキュメント・背景
-      placeholder: 例）docs/model-strategy.md の「エスカレーション基準」について
+      placeholder: 例）design/20-local-llm/2-retrieval の「古い情報を答えない仕組み」について

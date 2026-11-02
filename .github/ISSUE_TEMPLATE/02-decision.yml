@@ -1,43 +1,49 @@
-name: 🧭 設計判断の議論
-description: 技術選定や方針など、決める必要があることを議論する（決定後は ADR にする）
-title: "[Decision] "
+name: 🧭 今週の問い（設計で決めること）
+description: 設計で決める必要があることを問いとして立てる。担当者が決定記録の PR で答え、MTG で採用を決める
+title: "[問い] "
 labels: ["type:decision", "status:discussion"]
 body:
   - type: markdown
     attributes:
       value: |
-        結論が出たら `docs/adr/` に ADR を作成し、この Issue をリンクして閉じます。
-  - type: textarea
-    id: background
+        担当者は `design/templates/decision.md` をコピーして決定記録を書き、PR の本文に `Closes #<この Issue の番号>` と書いてください。
+        MTG で採用・却下が決まり、PR がマージされるとこの Issue は自動で閉じます。
+  - type: dropdown
+    id: area
     attributes:
-      label: 背景・決めたいこと
-      placeholder: 例）ローカル推論基盤を何にするか決めたい
+      label: 章
+      description: 決定記録を置く design/ のフォルダ
+      options:
+        - 00-overview 全体像
+        - 01-infra 研究室のインフラ
+        - 10-common 共通基盤
+        - 20-local-llm/1-eval-data 評価データ
+        - 20-local-llm/2-retrieval 検索
+        - 20-local-llm/3-generation 回答生成
+        - 20-local-llm/4-slack-eval Slack 連携と評価
+        - 30-claude-agent Claude エージェント
+        - interfaces 入出力の契約
     validations:
       required: true
   - type: textarea
-    id: options
+    id: question
     attributes:
-      label: 選択肢
-      description: 候補と、それぞれの長所・短所
-      value: |
-        1. 案 A
-           - 長所:
-           - 短所:
-        2. 案 B
-           - 長所:
-           - 短所:
+      label: 問い
+      description: 何を決めたいか。答えが選択肢になる形で
+      placeholder: 例）ドキュメントが更新されたとき、エージェントはどうやって最新を知るか
     validations:
       required: true
   - type: textarea
-    id: criteria
+    id: why
     attributes:
-      label: 判断基準・制約
-      placeholder: 例）GPU なしでも動くこと、日本語の精度、メンテの手間
+      label: なぜ今決める必要があるか
   - type: textarea
-    id: proposal
+    id: constraints
     attributes:
-      label: 現時点の推し案（あれば）
+      label: 前提と制約
+      placeholder: 例）データを学外に出さない、GPU は 1 台、12 月までに動かす
   - type: input
     id: deadline
     attributes:
-      label: いつまでに決めたいか
+      label: 決める MTG
+      placeholder: 例）2026-11-10
