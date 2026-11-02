@@ -9,10 +9,10 @@
 | 章 | 中身 | 担当 | 状態 |
 | --- | --- | --- | --- |
 | [00-overview](00-overview/) | 目的、目指す姿、2種類のエージェント、自動化レベル、権限レベル、[用語集](00-overview/glossary.md) | 立ち上げメンバー | キックオフで説明済み |
-| [01-infra](01-infra/) | 研究室のインフラの現状（ネットワーク、Proxmox、Cloudflare） | コース B | キックオフで説明済み |
+| [01-infra](01-infra/) | 研究室のインフラの現状（ネットワーク、Proxmox、Cloudflare） | コース B | infra-ops から反映（2026-11-02） |
 | [10-common](10-common/) | 共通基盤：Slack の受付、問い合わせの分類、2つのエージェントへの振り分け | コース C | 未着手 |
 | [20-local-llm](20-local-llm/) | ローカルLLM エージェント：ドキュメントに基づく回答 | コース A | 未着手 |
-| [30-claude-agent](30-claude-agent/) | Claude エージェント：サーバーの調査・提案・承認後の実行 | コース B | 未着手 |
+| [30-claude-agent](30-claude-agent/) | Claude エージェント：サーバーの調査・提案・承認後の実行 | コース B | 稼働中（L0／L1）。infra-ops から反映（2026-11-02） |
 | [interfaces](interfaces/) | コース間の入出力の契約 | 関係するコース全員 | たたき台 |
 
 ## 各章の中身

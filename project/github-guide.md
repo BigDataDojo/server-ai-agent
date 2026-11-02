@@ -37,6 +37,13 @@
 
 Issue を閉じたり PR をマージしたりすると、ボードも自動で更新される。
 
+### 作り方
+
+1. 組織の Projects → New project で「Board」を選び、名前を「server-ai-agent」にする
+2. Project の「…」→ Workflows →「Auto-add to project」を開き、リポジトリに server-ai-agent、フィルタに `is:issue` を指定して有効にする。既存の Issue は「Add item」から一度だけ手で追加する
+3. Status の列は「Todo」「In Progress」「Done」を使う。着手したら「In Progress」に動かし、閉じると「Done」に入る（Workflows の「Item closed」）
+4. fsm-lab/infra-ops の Issue は組織が違うのでこのボードには入らない。fsm-lab の組織に「infra-ops」の Project を作り、同じ手順で設定する
+
 ## Milestone
 
 [project/README.md](README.md#節目) の節目を Milestone にする（例：「11月末 評価データ完成」）。
